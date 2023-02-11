@@ -1,0 +1,11 @@
+*
+!*/
+
+!/.gitignore
+!/packaging/**/*
+!/config.ini
+!/run.bat
+!/LICENSE
+!/README.md
+
+__pycache__
