@@ -47,6 +47,8 @@ class CommandRunner():
     def _run_thread(self, on_start: Callable, on_finish: Callable, on_error: Callable[[], Exception]):
         if on_start:
             on_start()
+        
+        print("Started packaging sequence")
 
         for modname, target_options in self.sequence.items():
             print("-" * 20, modname, "-" * 20)
@@ -82,6 +84,7 @@ class CommandRunner():
 
     def run_sequence_tasks(self, tasks: list[Callable]):
         for taskname, task in tasks:
+            print(taskname)
             res = task()
 
             if res == False:
