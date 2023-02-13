@@ -5,6 +5,8 @@ from collections import OrderedDict
 from config import Config
 from package_commands import PackageCommands
 
+class CommandException(Exception):
+    pass
 
 class CommandRunner():
     # run order:
@@ -33,11 +35,16 @@ class CommandRunner():
             modconfig["server"] = False
     
 
-    def run(self, on_start: Callable, on_finish: Callable):
-        package_thread = threading.Thread(target=self._run_thread, args=(on_start, on_finish), daemon=True)
+    def run(self, on_start: Callable, on_finish: Callable, on_error: Callable[[], Exception]):
+        package_thread = threading.Thread(
+            target=self._run_thread,
+            args=(on_start, on_finish, on_error),
+            daemon=True
+        )
+
         package_thread.start()
 
-    def _run_thread(self, on_start: Callable, on_finish: Callable):
+    def _run_thread(self, on_start: Callable, on_finish: Callable, on_error: Callable[[], Exception]):
         if on_start:
             on_start()
 
@@ -45,37 +52,39 @@ class CommandRunner():
             print("-" * 20, modname, "-" * 20)
             commands = PackageCommands(self.config, modname)
 
-            can_zip = False
-            if target_options["client"]:
-                print("cook client", modname)
-                commands.cook_client()
+            try:
+                can_zip = False
+                if target_options["client"]:
+                    self.run_sequence_tasks([
+                        (f"Cook client {modname}", commands.cook_client),
+                        (f"Package client {modname}", commands.package_client),
+                        (f"Copy client {modname}", commands.copy_client),
+                    ])
 
-                print("pak client", modname)
-                commands.package_client()
+                if target_options["server"]:
+                    self.run_sequence_tasks([
+                        (f"Cook client {modname}", commands.cook_client),
+                        (f"Package client {modname}", commands.package_client),
+                        (f"Copy client {modname}", commands.copy_client),
+                    ])
+                
+                if can_zip:
+                    print("zip", modname)
+                    commands.zip_all()
 
-                can_zip = True
-
-                print("copy client", modname)
-                commands.copy_client()
-
-            if target_options["server"]:
-                print("cook server", modname)
-                commands.cook_server()
-
-                print("pak server", modname)
-                commands.package_server()
-                can_zip = True
-
-                print("copy server", modname)
-                commands.copy_server()
-            
-            if can_zip:
-                print("zip", modname)
-                commands.zip_all()
-
+            except Exception as e:
+                if on_error:
+                    on_error(e)
+                return
 
         if on_finish:
             on_finish()
 
+    def run_sequence_tasks(self, tasks: list[Callable]):
+        for taskname, task in tasks:
+            res = task()
 
-
+            if res == False:
+                raise CommandException(f"Task \"{taskname}\" failed. Check logs for details.")
+        
+        return True

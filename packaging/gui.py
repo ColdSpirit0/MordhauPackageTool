@@ -97,9 +97,15 @@ class GUI(tkinter.Tk):
             self.toggle_selection_button.configure(state="enabled")
 
             showinfo("Done packaging", "\n".join([f"{a} - {b}" for a, b in mod_values]))
+        
+        def on_error(e: Exception):
+            self.start_button.configure(state="enabled")
+            self.toggle_selection_button.configure(state="enabled")
+
+            showinfo(type(e).__name__, str(e))
 
         # start packaging
-        runner.run(on_start, on_finish)
+        runner.run(on_start, on_finish, on_error)
 
 
     def toggle_checkboxes(self):
