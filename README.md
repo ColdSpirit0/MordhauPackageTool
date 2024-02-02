@@ -15,5 +15,5 @@ Requirements:
 * Python (mine 3.11.1)
 * Python packages:
     ```Batch
-    pip install tk ttkwidgets
+    pip install -r requirements.txt
     ```
