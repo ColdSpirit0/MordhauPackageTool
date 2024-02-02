@@ -1,12 +1,14 @@
+from pathlib import Path
 from command_runner import CommandRunner
 from config import Config
 
 import tkinter
-from tkinter import ttk
+from tkinter import Menu, ttk
 from tkinter.messagebox import showinfo
 from ttkwidgets import CheckboxTreeview
 
 import threading
+import os
 
 
 
@@ -14,6 +16,7 @@ class GUI(tkinter.Tk):
     def __init__(self, config: Config, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
+        self.appconfig = config
         self.command_runner = CommandRunner(config)
 
         self.title("Mordhau package tool")
@@ -21,6 +24,8 @@ class GUI(tkinter.Tk):
         self.rowconfigure(0, weight=1)
         self.geometry("500x700")
         self.bind("<Escape>", lambda e: self.destroy())
+
+        self.create_menu()
 
         style = ttk.Style(self)
         style.theme_use("clam")
@@ -31,7 +36,7 @@ class GUI(tkinter.Tk):
         root_frame.rowconfigure(0, weight=1)
 
         tree = self.create_tree(root_frame)
-        self.create_buttons(root_frame)
+        self.create_bottom_buttons(root_frame)
 
         for mod in config.mods:
             self.add_mod(tree, mod.name)
@@ -121,15 +126,38 @@ class GUI(tkinter.Tk):
             self.tree.check_all()
 
 
-    def create_buttons(self, parent):
-        buttons_frame = ttk.Frame(parent)
-        buttons_frame.grid(sticky="nesw")
-        buttons_frame.columnconfigure(0, weight=1)
-        buttons_frame.columnconfigure(1, weight=1)
+    def create_bottom_buttons(self, parent):
+        frame = ttk.Frame(parent)
+        frame.grid(sticky="nesw")
 
-        self.toggle_selection_button = ttk.Button(buttons_frame, text="Toggle checkboxes", command=self.toggle_checkboxes)
-        self.start_button = ttk.Button(buttons_frame, text="Start", command=self.start_packaging)
+        self.toggle_selection_button = self.add_button(frame, "Toggle checkboxes", self.toggle_checkboxes)
+        self.start_button = self.add_button(frame, "Start", self.start_packaging)
 
-        # lay out elements
-        self.toggle_selection_button.grid(padx=5, pady=5, sticky="ew", row=0, column=0)
-        self.start_button.grid(padx=5, pady=5, sticky="ew", row=0, column=1)
+    
+    def add_button(self, frame: ttk.Frame, text: str, on_click: callable):
+        idx = len(frame.winfo_children())
+        frame.columnconfigure(idx, weight=1)
+        button = ttk.Button(frame, text=text, command=on_click)
+        button.grid(padx=5, pady=5, sticky="ew", row=0, column=idx)
+        return button
+
+    
+    def create_menu(self):
+        menubar = Menu(self)
+        self.config(menu=menubar)
+        open_menu = Menu(menubar)
+
+        def add_menu_item(name: str, path: str | Path):
+            open_menu.add_command(label=name, command=lambda: os.startfile(path))
+
+        if self.appconfig.custom_paks_server:
+            add_menu_item("CustomPaks Server", self.appconfig.custom_paks_server)
+
+        if self.appconfig.custom_paks_client:
+            add_menu_item("CustomPaks Client", self.appconfig.custom_paks_client)
+        
+        add_menu_item("SDK Mods", self.appconfig.mods_path)
+        add_menu_item("SDK Paks", self.appconfig.paks_path)
+        add_menu_item("SDK Zips", self.appconfig.zips_path)
+
+        menubar.add_cascade(label="Open", menu=open_menu)

@@ -22,6 +22,7 @@ class Config():
 
         self.mods_path = self.project_path / "Mods"
         self.paks_path = self.project_path / "Paks"
+        self.zips_path = self.project_path / "Zips"
 
         # get mods list
         self.mods = list(filter(Path.is_dir, self.mods_path.iterdir()))

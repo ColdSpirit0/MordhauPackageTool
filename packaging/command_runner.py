@@ -56,23 +56,25 @@ class CommandRunner():
 
             try:
                 can_zip = False
+
                 if target_options["client"]:
-                    self.run_sequence_tasks([
+                    can_zip = self.run_sequence_tasks([
                         (f"Cook client {modname}", commands.cook_client),
                         (f"Package client {modname}", commands.package_client),
                         (f"Copy client {modname}", commands.copy_client),
                     ])
 
                 if target_options["server"]:
-                    self.run_sequence_tasks([
-                        (f"Cook client {modname}", commands.cook_client),
-                        (f"Package client {modname}", commands.package_client),
-                        (f"Copy client {modname}", commands.copy_client),
+                    can_zip = self.run_sequence_tasks([
+                        (f"Cook server {modname}", commands.cook_server),
+                        (f"Package server {modname}", commands.package_server),
+                        (f"Copy server {modname}", commands.copy_server),
                     ])
                 
                 if can_zip:
-                    print("zip", modname)
-                    commands.zip_all()
+                    self.run_sequence_tasks([
+                        (f"Zip {modname}", commands.zip_all),
+                    ])
 
             except Exception as e:
                 if on_error:
