@@ -3,10 +3,13 @@
 
 !/.gitignore
 !/packaging/**/*
-!/config.ini
+# !/config.ini
 !/run.bat
 !/LICENSE
 !/README.md
 !/requirements.txt
+!/.vscode/*
+!/.flake8
+!/pyproject.toml
 
 __pycache__

@@ -2,11 +2,13 @@ from typing import Callable
 import threading
 from collections import OrderedDict
 
-from config import Config
-from package_commands import PackageCommands
+from .config import Config
+from .package_commands import PackageCommands
+
 
 class CommandException(Exception):
     pass
+
 
 class CommandRunner():
     # run order:
@@ -27,13 +29,13 @@ class CommandRunner():
         })
 
         modconfig[target] = True
-    
+
 
     def reset_mods(self):
         for modname, modconfig in self.sequence.items():
             modconfig["client"] = False
             modconfig["server"] = False
-    
+
 
     def run(self, on_start: Callable, on_finish: Callable, on_error: Callable[[], Exception]):
         package_thread = threading.Thread(
@@ -47,7 +49,7 @@ class CommandRunner():
     def _run_thread(self, on_start: Callable, on_finish: Callable, on_error: Callable[[], Exception]):
         if on_start:
             on_start()
-        
+
         print("Started packaging sequence")
 
         for modname, target_options in self.sequence.items():
@@ -70,7 +72,7 @@ class CommandRunner():
                         (f"Package server {modname}", commands.package_server),
                         (f"Copy server {modname}", commands.copy_server),
                     ])
-                
+
                 if can_zip:
                     self.run_sequence_tasks([
                         (f"Zip {modname}", commands.zip_all),
@@ -89,7 +91,7 @@ class CommandRunner():
             print(taskname)
             res = task()
 
-            if res == False:
+            if res is False:
                 raise CommandException(f"Task \"{taskname}\" failed. Check logs for details.")
-        
+
         return True

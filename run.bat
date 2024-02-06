@@ -1,1 +1,1 @@
-python .\packaging\__init__.py
+python -m packaging

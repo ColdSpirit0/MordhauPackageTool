@@ -1,6 +1,6 @@
 from pathlib import Path
-from command_runner import CommandRunner
-from config import Config
+from .command_runner import CommandRunner
+from .config import Config
 
 import tkinter
 from tkinter import Menu, ttk
@@ -68,7 +68,7 @@ class GUI(tkinter.Tk):
         mod_id = tree.insert("", "end", text=modname, open=True)
         tree.insert(mod_id, "end", text=f"{modname} Client", values=[modname, "client"])
         tree.insert(mod_id, "end", text=f"{modname} Server", values=[modname, "server"])
-    
+
 
     def watch_packaging_thread(self, thread: threading.Thread):
         if thread.is_alive():
@@ -102,7 +102,7 @@ class GUI(tkinter.Tk):
             self.toggle_selection_button.configure(state="enabled")
 
             showinfo("Done packaging", "\n".join([f"{a} - {b}" for a, b in mod_values]))
-        
+
         def on_error(e: Exception):
             self.start_button.configure(state="enabled")
             self.toggle_selection_button.configure(state="enabled")
@@ -133,7 +133,7 @@ class GUI(tkinter.Tk):
         self.toggle_selection_button = self.add_button(frame, "Toggle checkboxes", self.toggle_checkboxes)
         self.start_button = self.add_button(frame, "Start", self.start_packaging)
 
-    
+
     def add_button(self, frame: ttk.Frame, text: str, on_click: callable):
         idx = len(frame.winfo_children())
         frame.columnconfigure(idx, weight=1)
@@ -141,7 +141,7 @@ class GUI(tkinter.Tk):
         button.grid(padx=5, pady=5, sticky="ew", row=0, column=idx)
         return button
 
-    
+
     def create_menu(self):
         menubar = Menu(self)
         self.config(menu=menubar)
@@ -155,7 +155,7 @@ class GUI(tkinter.Tk):
 
         if self.appconfig.custom_paks_client:
             add_menu_item("CustomPaks Client", self.appconfig.custom_paks_client)
-        
+
         add_menu_item("SDK Mods", self.appconfig.mods_path)
         add_menu_item("SDK Paks", self.appconfig.paks_path)
         add_menu_item("SDK Zips", self.appconfig.zips_path)
