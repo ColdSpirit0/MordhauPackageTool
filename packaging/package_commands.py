@@ -12,7 +12,11 @@ class PackageCommands():
     def __init__(self, config: Config, modname: str) -> None:
         self.config = config
         self.modname = modname
-        self.logfile_path = Path("logs") / f"{int(time.time())}_{modname}.log"
+
+        logs_dir = Path("logs")
+        logs_dir.mkdir(exist_ok=True, parents=True)
+
+        self.logfile_path = logs_dir / f"{int(time.time())}_{modname}.log"
 
     def cook_client(self):
         self.log_header("Cook client")
