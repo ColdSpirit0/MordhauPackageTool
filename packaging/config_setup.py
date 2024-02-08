@@ -14,11 +14,8 @@ class ConfigSetup(tk.Tk):
         self.config_path = config_path
 
         self.title("Config setup")
-        self.columnconfigure(0, weight=1)
-        self.rowconfigure(0, weight=1)
-
-        def close_window():
-            self.destroy()
+        self.columnconfigure(1, weight=1)
+        # self.rowconfigure(0, weight=1)
 
         self.bind("<Escape>", lambda e: self.on_closed_manually())
         self.protocol("WM_DELETE_WINDOW", lambda: self.on_closed_manually())
@@ -36,7 +33,9 @@ class ConfigSetup(tk.Tk):
 
         # Ok button
         self.ok_button = ttk.Button(self, text="OK", command=self.on_ok_button_click)
-        self.ok_button.grid(row=3, column=0, pady=10)
+        self.ok_button.grid(row=3, column=0, padx=10, pady=10, columnspan=3)
+
+        self.center_window()
 
     def on_closed_manually(self):
         self.is_closed_manually = True
@@ -46,7 +45,7 @@ class ConfigSetup(tk.Tk):
         label = ttk.Label(self, text=label_text)
         label.grid(row=row, column=0, sticky=tk.W, padx=5, pady=5)
 
-        entry = ttk.Entry(self, textvariable=var, state="readonly")
+        entry = ttk.Entry(self, textvariable=var, state="readonly", width=100)
         entry.grid(row=row, column=1, padx=5, pady=5, sticky=tk.EW)
 
         browse_button = ttk.Button(self, text="Browse", command=lambda: self.browse_directory(var))
@@ -88,6 +87,19 @@ class ConfigSetup(tk.Tk):
                      get_valid_path(self.client_paks_path_var.get()),
                      get_valid_path(self.server_paks_path_var.get()))
         self.destroy()
+
+    def center_window(self):
+        self.update_idletasks()
+        width = self.winfo_width()
+        frm_width = self.winfo_rootx() - self.winfo_x()
+        win_width = width + 2 * frm_width
+        height = self.winfo_height()
+        titlebar_height = self.winfo_rooty() - self.winfo_y()
+        win_height = height + titlebar_height + frm_width
+        x = self.winfo_screenwidth() // 2 - win_width // 2
+        y = self.winfo_screenheight() // 2 - win_height // 2
+        self.geometry('{}x{}+{}+{}'.format(width, height, x, y))
+        self.deiconify()
 
 
 if __name__ == "__main__":
