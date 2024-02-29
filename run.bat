@@ -1,1 +1,1 @@
-python -m packaging
+python -m mordhau_packaging

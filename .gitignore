@@ -2,7 +2,7 @@
 !*/
 
 !/.gitignore
-!/packaging/**/*
+!/mordhau_packaging/**/*
 # !/config.ini
 !/run.bat
 !/LICENSE
