@@ -1,7 +1,7 @@
 # Mordhau package tool
 ---
 
-Helps you to package multiple mods at once and deploy them to CustomPak dir on Server and Client.
+Helps you to package multiple mods at once and copy them to CustomPak dir on Server and Client.
 
 How to use:
 * Execute `run.bat`
